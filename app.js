@@ -49,19 +49,13 @@ function sendTracking(status, questionNum) {
     status: status
   };
 
-  const blob = new Blob([JSON.stringify(payload)], { type: "text/plain" });
-  if (navigator.sendBeacon) {
-    navigator.sendBeacon(GOOGLE_SCRIPT_URL, blob);
-  } else {
-    fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    }).catch(() => {});
-  }
+  fetch(GOOGLE_SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  }).catch(() => {});
 }
-
 // 1. بدء الاختبار
 startBtn.addEventListener("click", () => {
   const nameInput = document.getElementById("user-name").value.trim();
