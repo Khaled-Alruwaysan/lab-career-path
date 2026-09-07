@@ -4,7 +4,7 @@ const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwb-bndT6vxAK
 let currentQuestionIndex = 0;
 let userAnswers = [];
 let scores = { hosp: 0, corp: 0, reg: 0, acad: 0, insur: 0 };
-let userData = { name: "", stage: "" };
+let userData = { name: "" };
 
 // عناصر الواجهة
 const introScreen = document.getElementById("intro-screen");
@@ -52,36 +52,49 @@ startBtn.addEventListener("click", () => {
 function loadQuestion(index) {
   const q = QUESTIONS[index];
 
+  // تحديث العداد وشريط التقدم
   questionCounter.textContent = `سؤال ${index + 1} من ${QUESTIONS.length}`;
   const progressPercent = ((index + 1) / QUESTIONS.length) * 100;
   progressBar.style.width = `${progressPercent}%`;
 
-  questionText.textContent = q.question;
-  optionsContainer.innerHTML = "";
-
+  // ظهور أو إخفاء زر الرجوع في الأسفل
   if (index === 0) {
     prevBtn.classList.add("invisible");
   } else {
     prevBtn.classList.remove("invisible");
   }
 
+  // تطبيق أنميشن الانتقال بين الأسئلة
+  questionText.classList.remove("question-animate");
+  optionsContainer.classList.remove("question-animate");
+  void questionText.offsetWidth; // إعادة تشغيل الأنميشن
+  questionText.classList.add("question-animate");
+  optionsContainer.classList.add("question-animate");
+
+  questionText.textContent = q.question;
+  optionsContainer.innerHTML = "";
+
+  // توليد الأزرار وحل مشكلة اللون الأزرق في الجوال
   q.options.forEach((opt) => {
     const btn = document.createElement("button");
-    btn.className = "w-full text-right p-3.5 md:p-4 rounded-2xl border border-slate-200/90 bg-white hover:border-blue-500 hover:bg-blue-50/40 text-slate-800 text-xs md:text-sm font-medium transition duration-150 flex items-center justify-between group active:scale-[0.99]";
+    btn.className = "opt-btn w-full text-right p-3.5 md:p-4 rounded-2xl border border-slate-200/90 bg-white text-slate-800 text-xs md:text-sm font-medium transition duration-150 flex items-center justify-between group active:scale-[0.99] select-none";
     
     btn.innerHTML = `
       <span class="leading-relaxed flex-grow pl-2">${opt.text}</span>
-      <span class="w-4 h-4 rounded-full border border-slate-300 flex-shrink-0 flex items-center justify-center group-hover:border-blue-500">
-        <span class="w-2 h-2 rounded-full bg-blue-600 opacity-0 group-hover:opacity-100 transition"></span>
+      <span class="opt-dot w-4 h-4 rounded-full border border-slate-300 flex-shrink-0 flex items-center justify-center">
+        <span class="opt-dot-inner w-2 h-2 rounded-full bg-blue-600 opacity-0 transition"></span>
       </span>
     `;
 
-    // وميض تأكيد قبل الانتقال للسؤال التالي
     btn.addEventListener("click", () => {
+      btn.blur(); // يلغي التحديد الفوري على شاشات الجوال
       btn.classList.add("border-blue-600", "bg-blue-50");
+      const dotInner = btn.querySelector(".opt-dot-inner");
+      if (dotInner) dotInner.classList.remove("opacity-0");
+
       setTimeout(() => {
         handleSelectOption(opt.weights);
-      }, 160);
+      }, 140);
     });
 
     optionsContainer.appendChild(btn);
@@ -119,7 +132,7 @@ prevBtn.addEventListener("click", () => {
   }
 });
 
-// 5. الحساب والنتيجة والاحتفال
+// 5. الحساب والنتيجة وتأثيرات الاحتفال
 function showLoadingAndResults() {
   quizScreen.classList.add("hidden");
   loadingScreen.classList.remove("hidden");
@@ -149,12 +162,12 @@ function showLoadingAndResults() {
     mainCard.classList.add("shake-effect");
     setTimeout(() => mainCard.classList.remove("shake-effect"), 500);
 
-    // تشغيل اهتزاز عتاد الجوال (إن وُجد)
+    // تشغيل اهتزاز الهاتف
     if ("vibrate" in navigator) {
       navigator.vibrate([80, 40, 120]);
     }
 
-    // إطلاق فرقعة الحفلات الملونة (Confetti)
+    // إطلاق فرقعة الحفلات الملونة
     confetti({
       particleCount: 90,
       spread: 75,
@@ -162,7 +175,7 @@ function showLoadingAndResults() {
       colors: ['#2563eb', '#4f46e5', '#059669', '#d97706', '#e11d48']
     });
 
-    // تحديث بيانات بطاقة التقرير
+    // تحديث بطاقة التقرير
     cardUserName.textContent = `التقرير المهني: ${userData.name}`;
     const today = new Date();
     cardDate.textContent = today.toLocaleDateString("ar-SA", { year: "numeric", month: "long" });
@@ -176,7 +189,7 @@ function showLoadingAndResults() {
 
     trackAdvice.textContent = topTrack.advice;
 
-    // رسم أشرطة النسب
+    // رسم أشرطة المقارنة
     tracksProgressList.innerHTML = "";
     sortedTracks.forEach((key) => {
       const item = TRACKS_INFO[key];
@@ -196,10 +209,10 @@ function showLoadingAndResults() {
       tracksProgressList.appendChild(barRow);
     });
 
-    // إرسال البيانات لجوجل شيت
+    // إرسال البيانات لجوجل شيت بالأعمدة الجديدة
     sendDataToSheet(topTrack.title, percentages[topKey], percentages);
 
-    // زر X
+    // نشر في X
     shareXBtn.onclick = () => {
       const tweetText = encodeURIComponent(
         `أجريت مقياس المسار المهني لعلوم المختبرات الطبية وكانت نتيجتي:\n🎯 القطاع الأنسب: ${topTrack.title} بنسبة توافق (${percentages[topKey]}%)!\n\nاكتشف مسارك من هنا:`
@@ -208,7 +221,7 @@ function showLoadingAndResults() {
       window.open(`https://twitter.com/intent/tweet?text=${tweetText}&url=${url}`, "_blank");
     };
 
-    // زر نسخ الرابط
+    // نسخ الرابط
     copyLinkBtn.onclick = () => {
       navigator.clipboard.writeText(window.location.href).then(() => {
         copyLinkText.textContent = "تم النسخ!";
@@ -225,7 +238,7 @@ function showLoadingAndResults() {
   }, 1200);
 }
 
-// 6. إرسال البيانات لـ Google Sheets
+// 6. إرسال البيانات إلى Google Sheets (المحدثة)
 function sendDataToSheet(topTrack, topScore, allScores) {
   const payload = {
     name: userData.name,
