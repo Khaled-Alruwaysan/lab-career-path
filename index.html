@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>مقياس المسار المهني | علوم المختبرات الإكلينيكية</title>
+  <title>مقياس المسار المهني | علوم المختبرات الطبية</title>
 
   <!-- وسوم المشاركة ومعاينة الروابط -->
   <meta name="description" content="اختبار تفاعلي مبني على 18 سيناريو عملي لتحديد مسارك المهني الأنسب في تخصص المختبرات الطبية بالأرقام.">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="مقياس المسار المهني | علوم المختبرات الإكلينيكية">
+  <meta property="og:title" content="مقياس المسار المهني | علوم المختبرات الطبية">
   <meta property="og:description" content="حلل ميولك في دقيقتين واكتشف قطاعك الأنسب: مستشفيات، شركات أجهزة، هيئات رقابية، أبحاث، أو تأمين واستشارات.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="بوصلة المسار المهني لعلوم المختبرات الطبية">
@@ -43,9 +43,31 @@
       80% { transform: translate(3px, 2px); }
       100% { transform: translate(0, 0) scale(1); }
     }
-
     .shake-effect {
       animation: screenShake 0.45s ease-in-out;
+    }
+
+    /* أنميشن الانتقال بين الأسئلة */
+    @keyframes questionFadeIn {
+      0% { opacity: 0; transform: translateY(8px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .question-animate {
+      animation: questionFadeIn 0.25s ease-out forwards;
+    }
+
+    /* تأثير التمرير بالماوس فقط دون اللمس بالجوال */
+    @media (hover: hover) and (pointer: fine) {
+      .opt-btn:hover {
+        border-color: #3b82f6;
+        background-color: #eff6ff;
+      }
+      .opt-btn:hover .opt-dot {
+        border-color: #3b82f6;
+      }
+      .opt-btn:hover .opt-dot-inner {
+        opacity: 1;
+      }
     }
   </style>
 </head>
@@ -58,7 +80,7 @@
   <!-- الحاوية الرئيسية -->
   <main class="w-full max-w-lg custom-gradient rounded-[2.5rem] shadow-2xl border border-white/60 backdrop-blur-xl overflow-hidden relative min-h-[600px] flex flex-col justify-between transition-all duration-300">
 
-<!-- 1. شاشة البداية -->
+    <!-- 1. شاشة البداية -->
     <section id="intro-screen" class="p-6 md:p-8 flex flex-col justify-between flex-grow">
       <div class="space-y-6">
         
@@ -82,7 +104,6 @@
           </p>
         </div>
 
-        <!-- حقل الاسم فقط -->
         <div class="space-y-1 pt-2">
           <label class="block text-xs font-bold text-slate-700 mr-1">الاسم أو اللقب (اختياري لبطاقة النتيجة)</label>
           <input type="text" id="user-name" placeholder="اكتب اسمك ليظهر على التقرير..." 
@@ -105,11 +126,7 @@
     <!-- 2. شاشة الأسئلة -->
     <section id="quiz-screen" class="p-6 md:p-8 flex flex-col justify-between flex-grow hidden">
       <div>
-        <div class="flex items-center justify-between mb-4">
-          <button id="prev-btn" class="text-xs font-bold text-slate-400 hover:text-slate-700 flex items-center gap-1 transition py-1 px-2 rounded-lg hover:bg-slate-200/50">
-            <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
-            <span>السابق</span>
-          </button>
+        <div class="flex items-center justify-end mb-4">
           <span id="question-counter" class="text-xs font-extrabold text-blue-700 bg-blue-100/70 px-3 py-1 rounded-full border border-blue-200/50">
             سؤال 1 من 18
           </span>
@@ -124,8 +141,13 @@
         <div id="options-container" class="space-y-2.5"></div>
       </div>
 
-      <div class="mt-6 text-center">
-        <span class="text-[11px] font-medium text-slate-400">حدد إجابتك للانتقال المباشر</span>
+      <!-- أسفل شاشة الأسئلة: زر الرجوع مع نص المساعدة -->
+      <div class="mt-6 pt-3 border-t border-slate-100 flex items-center justify-between">
+        <button id="prev-btn" class="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1.5 py-2 px-4 rounded-xl bg-slate-100 transition active:scale-95 invisible">
+          <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+          <span>السابق</span>
+        </button>
+        <span class="text-[11px] font-medium text-slate-400">حدد إجابتك للانتقال التلقائي</span>
       </div>
     </section>
 
@@ -227,8 +249,5 @@
 
   <script src="questions.js"></script>
   <script src="app.js"></script>
-  <p class="text-center text-[11px] text-slate-400 font-medium leading-relaxed">
-</p>
 </body>
 </html>
-
