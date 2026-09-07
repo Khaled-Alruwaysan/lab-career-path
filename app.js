@@ -1,10 +1,12 @@
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwb-bndT6vxAKsZNVHX5KHcj_VU8bVPDvegjW6a6nHyMApWOqOgDqAwu8KPWEc1-o6k1Q/exec";
 
 // حالة التطبيق
+const sessionId = "usr_" + Math.random().toString(36).substring(2, 11);
 let currentQuestionIndex = 0;
 let userAnswers = [];
 let scores = { hosp: 0, corp: 0, reg: 0, acad: 0, insur: 0 };
 let userData = { name: "" };
+let testCompleted = false;
 
 // عناصر الواجهة
 const introScreen = document.getElementById("intro-screen");
@@ -37,48 +39,69 @@ const copyLinkBtn = document.getElementById("copy-link-btn");
 const copyLinkText = document.getElementById("copy-link-text");
 const restartBtn = document.getElementById("restart-btn");
 
+// دالة تتبع الزيارات والانسحاب
+function sendTracking(status, questionNum) {
+  const payload = {
+    type: "tracking",
+    sessionId: sessionId,
+    name: userData.name || "مجهول",
+    lastQuestion: questionNum,
+    status: status
+  };
+
+  const blob = new Blob([JSON.stringify(payload)], { type: "text/plain" });
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon(GOOGLE_SCRIPT_URL, blob);
+  } else {
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }).catch(() => {});
+  }
+}
+
 // 1. بدء الاختبار
 startBtn.addEventListener("click", () => {
   const nameInput = document.getElementById("user-name").value.trim();
   userData.name = nameInput !== "" ? nameInput : "ممارس مخبري";
+  testCompleted = false;
 
   introScreen.classList.add("hidden");
   quizScreen.classList.remove("hidden");
 
   loadQuestion(0);
+  sendTracking("بدأ التقييم", 1);
 });
 
 // 2. تحميل السؤال
 function loadQuestion(index) {
   const q = QUESTIONS[index];
 
-  // تحديث العداد وشريط التقدم
   questionCounter.textContent = `سؤال ${index + 1} من ${QUESTIONS.length}`;
   const progressPercent = ((index + 1) / QUESTIONS.length) * 100;
   progressBar.style.width = `${progressPercent}%`;
 
-  // ظهور أو إخفاء زر الرجوع في الأسفل
   if (index === 0) {
     prevBtn.classList.add("invisible");
   } else {
     prevBtn.classList.remove("invisible");
   }
 
-  // تطبيق أنميشن الانتقال بين الأسئلة
   questionText.classList.remove("question-animate");
   optionsContainer.classList.remove("question-animate");
-  void questionText.offsetWidth; // إعادة تشغيل الأنميشن
+  void questionText.offsetWidth;
   questionText.classList.add("question-animate");
   optionsContainer.classList.add("question-animate");
 
   questionText.textContent = q.question;
   optionsContainer.innerHTML = "";
 
-  // توليد الأزرار وحل مشكلة اللون الأزرق في الجوال
   q.options.forEach((opt) => {
     const btn = document.createElement("button");
     btn.className = "opt-btn w-full text-right p-3.5 md:p-4 rounded-2xl border border-slate-200/90 bg-white text-slate-800 text-xs md:text-sm font-medium transition duration-150 flex items-center justify-between group active:scale-[0.99] select-none";
-    
+
     btn.innerHTML = `
       <span class="leading-relaxed flex-grow pl-2">${opt.text}</span>
       <span class="opt-dot w-4 h-4 rounded-full border border-slate-300 flex-shrink-0 flex items-center justify-center">
@@ -87,7 +110,7 @@ function loadQuestion(index) {
     `;
 
     btn.addEventListener("click", () => {
-      btn.blur(); // يلغي التحديد الفوري على شاشات الجوال
+      btn.blur();
       btn.classList.add("border-blue-600", "bg-blue-50");
       const dotInner = btn.querySelector(".opt-dot-inner");
       if (dotInner) dotInner.classList.remove("opacity-0");
@@ -114,6 +137,7 @@ function handleSelectOption(weights) {
   if (currentQuestionIndex < QUESTIONS.length) {
     loadQuestion(currentQuestionIndex);
   } else {
+    testCompleted = true;
     showLoadingAndResults();
   }
 }
@@ -132,7 +156,7 @@ prevBtn.addEventListener("click", () => {
   }
 });
 
-// 5. الحساب والنتيجة وتأثيرات الاحتفال
+// 5. الحساب والنتيجة
 function showLoadingAndResults() {
   quizScreen.classList.add("hidden");
   loadingScreen.classList.remove("hidden");
@@ -158,16 +182,13 @@ function showLoadingAndResults() {
     loadingScreen.classList.add("hidden");
     resultScreen.classList.remove("hidden");
 
-    // تشغيل الاهتزاز البصري للشاشة
     mainCard.classList.add("shake-effect");
     setTimeout(() => mainCard.classList.remove("shake-effect"), 500);
 
-    // تشغيل اهتزاز الهاتف
     if ("vibrate" in navigator) {
       navigator.vibrate([80, 40, 120]);
     }
 
-    // إطلاق فرقعة الحفلات الملونة
     confetti({
       particleCount: 90,
       spread: 75,
@@ -175,7 +196,6 @@ function showLoadingAndResults() {
       colors: ['#2563eb', '#4f46e5', '#059669', '#d97706', '#e11d48']
     });
 
-    // تحديث بطاقة التقرير
     cardUserName.textContent = `التقرير المهني: ${userData.name}`;
     const today = new Date();
     cardDate.textContent = today.toLocaleDateString("ar-SA", { year: "numeric", month: "long" });
@@ -189,7 +209,6 @@ function showLoadingAndResults() {
 
     trackAdvice.textContent = topTrack.advice;
 
-    // رسم أشرطة المقارنة
     tracksProgressList.innerHTML = "";
     sortedTracks.forEach((key) => {
       const item = TRACKS_INFO[key];
@@ -209,10 +228,10 @@ function showLoadingAndResults() {
       tracksProgressList.appendChild(barRow);
     });
 
-    // إرسال البيانات لجوجل شيت بالأعمدة الجديدة
+    // تسجيل البيانات النهائية والتقرير
     sendDataToSheet(topTrack.title, percentages[topKey], percentages);
+    sendTracking("مكتمل", QUESTIONS.length);
 
-    // نشر في X
     shareXBtn.onclick = () => {
       const tweetText = encodeURIComponent(
         `أجريت مقياس المسار المهني لعلوم المختبرات الطبية وكانت نتيجتي:\n🎯 القطاع الأنسب: ${topTrack.title} بنسبة توافق (${percentages[topKey]}%)!\n\nاكتشف مسارك من هنا:`
@@ -221,7 +240,6 @@ function showLoadingAndResults() {
       window.open(`https://twitter.com/intent/tweet?text=${tweetText}&url=${url}`, "_blank");
     };
 
-    // نسخ الرابط
     copyLinkBtn.onclick = () => {
       navigator.clipboard.writeText(window.location.href).then(() => {
         copyLinkText.textContent = "تم النسخ!";
@@ -238,7 +256,7 @@ function showLoadingAndResults() {
   }, 1200);
 }
 
-// 6. إرسال البيانات إلى Google Sheets (المحدثة)
+// 6. إرسال النتائج النهائية
 function sendDataToSheet(topTrack, topScore, allScores) {
   const payload = {
     name: userData.name,
@@ -255,7 +273,7 @@ function sendDataToSheet(topTrack, topScore, allScores) {
   }).catch((err) => console.log("Sheet Sync Error:", err));
 }
 
-// 7. تصدير البطاقة كصورة
+// 7. تصدير البطاقة
 downloadCardBtn.addEventListener("click", () => {
   const target = document.getElementById("capture-area");
   downloadCardBtn.textContent = "جاري الحفظ...";
@@ -277,6 +295,14 @@ restartBtn.addEventListener("click", () => {
   currentQuestionIndex = 0;
   userAnswers = [];
   scores = { hosp: 0, corp: 0, reg: 0, acad: 0, insur: 0 };
+  testCompleted = false;
   resultScreen.classList.add("hidden");
   introScreen.classList.remove("hidden");
+});
+
+// 9. رصد إغلاق الصفحة أو الخروج في منتصف الاختبار
+window.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden" && !testCompleted && currentQuestionIndex > 0) {
+    sendTracking("خرج ولم يكمل", currentQuestionIndex + 1);
+  }
 });
