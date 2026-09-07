@@ -1,1 +1,234 @@
-# lab-career-path
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مقياس المسار المهني | علوم المختبرات الإكلينيكية</title>
+
+  <!-- وسوم المشاركة ومعاينة الروابط -->
+  <meta name="description" content="اختبار تفاعلي مبني على 18 سيناريو عملي لتحديد مسارك المهني الأنسب في تخصص المختبرات الطبية بالأرقام.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="مقياس المسار المهني | علوم المختبرات الإكلينيكية">
+  <meta property="og:description" content="حلل ميولك في دقيقتين واكتشف قطاعك الأنسب: مستشفيات، شركات أجهزة، هيئات رقابية، أبحاث، أو تأمين واستشارات.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="بوصلة المسار المهني لعلوم المختبرات الطبية">
+  <meta name="twitter:description" content="اكتشف مسارك الوظيفي الأنسب بالأرقام والنسب عبر 18 سيناريو مهني واقعي.">
+
+  <!-- Tailwind CSS عبر CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- مكتبة تحويل النتيجة لصورة -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- مكتبة فرقعة الاحتفال (Confetti) -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  
+  <!-- خط تجوال -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+    }
+    .custom-gradient {
+      background: radial-gradient(120% 120% at 50% 0%, #ffffff 0%, #f8fafc 100%);
+    }
+
+    /* أنميشن اهتزاز الشاشة الاحتفالي */
+    @keyframes screenShake {
+      0% { transform: translate(0, 0) scale(1); }
+      20% { transform: translate(-4px, 3px) scale(0.997); }
+      40% { transform: translate(4px, -3px) scale(1.003); }
+      60% { transform: translate(-3px, -2px); }
+      80% { transform: translate(3px, 2px); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    .shake-effect {
+      animation: screenShake 0.45s ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-800 min-h-screen flex items-center justify-center p-3 md:p-6 selection:bg-blue-600 selection:text-white relative overflow-x-hidden">
+
+  <!-- لمسات ضوئية بالخلفية -->
+  <div class="fixed top-[-10%] left-[-10%] w-[350px] h-[350px] bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="fixed bottom-[-10%] right-[-10%] w-[350px] h-[350px] bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+  <!-- الحاوية الرئيسية -->
+  <main class="w-full max-w-lg custom-gradient rounded-[2.5rem] shadow-2xl border border-white/60 backdrop-blur-xl overflow-hidden relative min-h-[600px] flex flex-col justify-between transition-all duration-300">
+
+<!-- 1. شاشة البداية -->
+    <section id="intro-screen" class="p-6 md:p-8 flex flex-col justify-between flex-grow">
+      <div class="space-y-6">
+        
+        <div class="flex items-center justify-between">
+          <span class="inline-flex items-center gap-1.5 bg-blue-500/10 text-blue-700 px-3.5 py-1.5 rounded-full text-xs font-bold border border-blue-200/50">
+            <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+            توجيه مهني تخصصي
+          </span>
+          <span class="text-xs font-semibold text-slate-400">18 سيناريو عملي 🎯</span>
+        </div>
+        
+        <div class="space-y-2.5">
+          <h1 class="text-2xl md:text-3xl font-black text-slate-900 leading-tight">
+            بوصلة المسار المهني <br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+              لعلوم المختبرات الطبية
+            </span>
+          </h1>
+          <p class="text-slate-600 text-sm leading-relaxed font-normal">
+            اختبار تفاعلي مبني على سيناريوهات واقعية من سوق العمل الصحي، يحدد وجهتك الوظيفية الأنسب بدقة وبالنسب المئوية.
+          </p>
+        </div>
+
+        <!-- حقل الاسم فقط -->
+        <div class="space-y-1 pt-2">
+          <label class="block text-xs font-bold text-slate-700 mr-1">الاسم أو اللقب (اختياري لبطاقة النتيجة)</label>
+          <input type="text" id="user-name" placeholder="اكتب اسمك ليظهر على التقرير..." 
+                 class="w-full px-4 py-3 rounded-2xl bg-white/80 border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none text-sm transition font-medium">
+        </div>
+
+      </div>
+
+      <div class="pt-8 space-y-3">
+        <button id="start-btn" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold py-4 px-6 rounded-2xl shadow-lg shadow-blue-600/30 active:scale-[0.98] transition flex items-center justify-center gap-2">
+          <span>ابدأ التقييم الآن</span>
+          <svg class="w-5 h-5 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+        <p class="text-center text-[11px] text-slate-400 font-medium leading-relaxed">
+          🔒 نلتزم بالخصوصية: المشاركة اختيارية، وتُحفظ النتائج بشكل مجهول لأغراض الإحصاء وتطوير المبادرة فقط.
+        </p>
+      </div>
+    </section>
+
+    <!-- 2. شاشة الأسئلة -->
+    <section id="quiz-screen" class="p-6 md:p-8 flex flex-col justify-between flex-grow hidden">
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <button id="prev-btn" class="text-xs font-bold text-slate-400 hover:text-slate-700 flex items-center gap-1 transition py-1 px-2 rounded-lg hover:bg-slate-200/50">
+            <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+            <span>السابق</span>
+          </button>
+          <span id="question-counter" class="text-xs font-extrabold text-blue-700 bg-blue-100/70 px-3 py-1 rounded-full border border-blue-200/50">
+            سؤال 1 من 18
+          </span>
+        </div>
+
+        <div class="w-full bg-slate-200/70 h-2 rounded-full overflow-hidden mb-6 p-0.5">
+          <div id="progress-bar" class="bg-gradient-to-r from-blue-600 to-indigo-600 h-full w-[5%] rounded-full transition-all duration-300"></div>
+        </div>
+
+        <h2 id="question-text" class="text-base md:text-lg font-extrabold text-slate-900 leading-snug mb-5 min-h-[50px]"></h2>
+
+        <div id="options-container" class="space-y-2.5"></div>
+      </div>
+
+      <div class="mt-6 text-center">
+        <span class="text-[11px] font-medium text-slate-400">حدد إجابتك للانتقال المباشر</span>
+      </div>
+    </section>
+
+    <!-- 3. شاشة المعالجة -->
+    <section id="loading-screen" class="p-8 flex flex-col items-center justify-center flex-grow text-center hidden">
+      <div class="relative w-16 h-16 mb-5">
+        <div class="absolute inset-0 rounded-full border-4 border-slate-200"></div>
+        <div class="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin"></div>
+      </div>
+      <h3 class="text-lg font-black text-slate-900 mb-1.5">جاري تحليل النمط المهني...</h3>
+      <p class="text-xs text-slate-500 max-w-xs leading-relaxed font-medium">نقوم بمطابقة اختياراتك مع مؤشرات المهارات والقطاعات المعتمدة</p>
+    </section>
+
+    <!-- 4. شاشة النتيجة النهائية -->
+    <section id="result-screen" class="p-6 md:p-8 flex flex-col justify-between flex-grow hidden">
+      
+      <!-- بطاقة النتيجة (تُحفظ كصورة) -->
+      <div id="capture-area" class="space-y-5 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm relative">
+        
+        <!-- الترويسة العليا للبطاقة -->
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3 text-[11px] text-slate-400 font-bold">
+          <span id="card-user-name">التقرير المهني: ممارس مخبري</span>
+          <span id="card-date">2026</span>
+        </div>
+
+        <!-- الترويسة الرئيسية -->
+        <div class="text-center space-y-2">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-2xl mb-1 shadow-inner">
+            🧬
+          </div>
+          <p class="text-[11px] font-extrabold text-slate-400 tracking-wider uppercase">مسارك المهني الأنسب</p>
+          <h2 id="top-track-title" class="text-xl md:text-2xl font-black text-slate-900">...</h2>
+          <p id="top-track-desc" class="text-xs text-slate-500 font-medium max-w-sm mx-auto leading-relaxed">...</p>
+          
+          <div class="pt-2">
+            <span id="top-track-match" class="inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-xs px-4 py-1.5 rounded-full shadow-md shadow-blue-500/25">
+              --% توافق
+            </span>
+          </div>
+        </div>
+
+        <!-- المسار الثاني البديل -->
+        <div class="bg-slate-50 rounded-2xl p-3 flex items-center justify-between border border-slate-100/80">
+          <div class="flex items-center gap-2.5">
+            <span class="text-xl">🥈</span>
+            <div>
+              <p class="text-[10px] font-bold text-slate-400">البديل الأقرب لميولك</p>
+              <p id="second-track-title" class="text-xs font-extrabold text-slate-800">...</p>
+            </div>
+          </div>
+          <span id="second-track-match" class="text-xs font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-xl">--%</span>
+        </div>
+
+        <!-- أشرطة المقارنة التراكمية -->
+        <div class="space-y-2.5 pt-1">
+          <p class="text-xs font-black text-slate-700">توزيع التوافق عبر كافة القطاعات:</p>
+          <div id="tracks-progress-list" class="space-y-2"></div>
+        </div>
+
+        <!-- التوصية والخطوة القادمة -->
+        <div class="bg-blue-50/80 border border-blue-100 rounded-2xl p-3.5 text-right space-y-1">
+          <p class="text-[11px] font-bold text-blue-900 flex items-center gap-1.5">
+            <span>🚀</span> خطوتك التالية للتميز:
+          </p>
+          <p id="track-advice" class="text-[11px] text-blue-800 leading-relaxed font-normal"></p>
+        </div>
+
+        <!-- تذييل عام محايد للبطاقة -->
+        <div class="text-center pt-2 border-t border-slate-100/80">
+          <p class="text-[10px] text-slate-400 font-medium">مبادرة توجيه المسار المهني لعلوم المختبرات الطبية</p>
+        </div>
+      </div>
+
+      <!-- أزرار الإجراءات -->
+      <div class="pt-5 space-y-2.5">
+        <button id="download-card-btn" class="w-full bg-slate-900 hover:bg-black text-white font-extrabold py-3 px-4 rounded-2xl text-xs transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-lg shadow-slate-900/10">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          <span>حفظ بطاقة النتيجة كصورة</span>
+        </button>
+
+        <div class="flex gap-2">
+          <button id="share-x-btn" class="flex-1 bg-black hover:bg-slate-800 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1.5">
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            <span>انشر في X</span>
+          </button>
+          <button id="copy-link-btn" class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold py-2.5 px-3 rounded-xl text-xs border border-blue-200/60 transition flex items-center justify-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+            <span id="copy-link-text">نسخ الرابط</span>
+          </button>
+          <button id="restart-btn" class="bg-white hover:bg-slate-100 text-slate-700 font-bold py-2.5 px-3.5 rounded-xl text-xs border border-slate-200 transition">
+            إعادة
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="questions.js"></script>
+  <script src="app.js"></script>
+  <p class="text-center text-[11px] text-slate-400 font-medium leading-relaxed">
+</p>
+</body>
+</html>
+
