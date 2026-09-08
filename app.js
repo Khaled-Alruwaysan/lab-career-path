@@ -71,6 +71,7 @@ startBtn.addEventListener("click", () => {
 
 // 2. تحميل السؤال
 // 2. تحميل السؤال مع خلط الخيارات عشوائياً
+// 2. تحميل السؤال مع خلط الخيارات عشوائياً
 function loadQuestion(index) {
   const q = QUESTIONS[index];
 
