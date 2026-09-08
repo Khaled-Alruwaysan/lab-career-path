@@ -70,6 +70,7 @@ startBtn.addEventListener("click", () => {
 });
 
 // 2. تحميل السؤال
+// 2. تحميل السؤال مع خلط الخيارات عشوائياً
 function loadQuestion(index) {
   const q = QUESTIONS[index];
 
@@ -92,7 +93,10 @@ function loadQuestion(index) {
   questionText.textContent = q.question;
   optionsContainer.innerHTML = "";
 
-  q.options.forEach((opt) => {
+  // عمل نسخة من الخيارات وخلط ترتيبها عشوائياً
+  const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+
+  shuffledOptions.forEach((opt) => {
     const btn = document.createElement("button");
     btn.className = "opt-btn w-full text-right p-3.5 md:p-4 rounded-2xl border border-slate-200/90 bg-white text-slate-800 text-xs md:text-sm font-medium transition duration-150 flex items-center justify-between group active:scale-[0.99] select-none";
 
@@ -117,7 +121,6 @@ function loadQuestion(index) {
     optionsContainer.appendChild(btn);
   });
 }
-
 // 3. معالجة الإجابة
 function handleSelectOption(weights) {
   userAnswers[currentQuestionIndex] = weights;
